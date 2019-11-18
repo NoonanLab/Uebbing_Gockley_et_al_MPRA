@@ -12,4 +12,4 @@ R scripts to analyze our first round of MPRA.
 R scripts to analyze our second round of MPRA.
 
 ***
-With questions and comments contact severin.uebbing-&auml-yale.edu or james.noonan-&auml-yale.edu.
+With questions and comments contact severin.uebbing-&auml;t-yale.edu or james.noonan-&auml;t-yale.edu.
