@@ -1298,7 +1298,7 @@ if (Mode == "INERT"):
 			cmd = "time fastx_trimmer -Q 33 -f 10 -i Inert_ReadOne.fastq -o Inert_R1_Trimmed.fastq"
 			print >>PipeOUT, cmd
 			subprocess.Popen(cmd, shell=True).wait()
-			#Align the mate pairs into a singel contig
+			#Align the mate pairs into a single contig
 			cmd = "time pear -j 20 -q 33 -f Inert_R1_Trimmed.fastq -r Inert_ReadTwo.fastq -o Inert_AlignedReads >Inert_Pear_Log.txt"
 			print >>PipeOUT, cmd
 			subprocess.Popen(cmd, shell=True).wait()
@@ -1500,7 +1500,7 @@ elif (Mode == "COMP"):
 		subprocess.Popen(cmd, shell=True).wait()
 		#Orient Reads so that 5 + Strand is Read One and 3' - Strand is Read Two
 		Comp_TAG_Strander( "Comp_R1_Trimmed.fastq", "Comp_R2_Trimmed.fastq" )
-		#Align the mate pairs into a singel contig
+		#Align the mate pairs into a single contig
 		cmd = "time pear -j 20 -q 33 -f Comp_ReadOne.fastq -r Comp_ReadTwo.fastq -o Comp_AlignedReads > Comp_Pear_Log.txt"
 		print >>PipeOUT, cmd
 		subprocess.Popen(cmd, shell=True).wait()
