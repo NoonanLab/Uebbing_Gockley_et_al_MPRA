@@ -35,13 +35,13 @@ if(file.exists("data/MPRAsum1.tsv")){ # If file available, load; else create
 	}
 	# Find Poisson error cutoff #
 	par(mfrow=c(2,2),las=1)
-	plot(density(MPRAnorm1$Rep_1_2_pDNA_Tag_Counts))
+	plot(density(MPRAnorm1$Rep_1_2_pDNA_Tag_Counts),main="Rep 12",xlab=expression(paste(log[2]," pDNA counts")),ylab="Relative amount",yaxt="n")
 	abline(v=-5.25,col=2)
-	plot(density(MPRAnorm1$Rep_1_3_pDNA_Tag_Counts))
+	plot(density(MPRAnorm1$Rep_1_3_pDNA_Tag_Counts),main="Rep 13",xlab=expression(paste(log[2]," pDNA counts")),ylab="Relative amount",yaxt="n")
 	abline(v=-5.25,col=2)
-	plot(density(MPRAnorm1$Rep_2_2_pDNA_Tag_Counts))
+	plot(density(MPRAnorm1$Rep_2_2_pDNA_Tag_Counts),main="Rep 22",xlab=expression(paste(log[2]," pDNA counts")),ylab="Relative amount",yaxt="n")
 	abline(v=-5.25,col=2)
-	plot(density(MPRAnorm1$Rep_2_3_pDNA_Tag_Counts))
+	plot(density(MPRAnorm1$Rep_2_3_pDNA_Tag_Counts),main="Rep 23",xlab=expression(paste(log[2]," pDNA counts")),ylab="Relative amount",yaxt="n")
 	abline(v=-5.25,col=2)
 	
 	MPRAnorm1<-MPRAnorm1[rowSums(MPRAnorm1[,c(11,16:19)])/5 >= -5.25,] # cutoff for Poisson error (only pDNA!)
