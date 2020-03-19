@@ -639,22 +639,37 @@ if(file.exists("data/diffActive1_1.tsv")){ # If available load; else create
 MPRAda1_1<-cbind(MPRAda1_1,diff=apply(MPRAda1_1[,19:22],1,mean)-apply(MPRAda1_1[,44:47],1,mean))
 
 ### MORE CONSERVATIVE FRAGMENT SETS FOR REPORTED STATISTICS ###
-# Active fragments have cDNA > pDNA in all replicates and an average log2 activity >0.1
+# Active fragments have adjusted P value <0.05 and cDNA > pDNA in all replicates
 if(file.exists("data/MPRAactive1_2.tsv")){ # If available load; else create
 	MPRAactive1_2<-read.delim("data/MPRAactive1_2.tsv",stringsAsFactors=F)
 }else{
+	a<-nrow(MPRAfrag1)
+	MPRAactiveDummy<-data.frame(Rep12=double(a),Rep13=double(a),Rep22=double(a),Rep23=double(a))
+	MPRAactiveDummy$Rep12<-replace(MPRAactiveDummy$Rep12,p.adjust(MPRAfrag1$Rep12_ttest_P,method="BH")<.05 & !is.na(MPRAfrag1$Rep12_ttest_P),T)
+	MPRAactiveDummy$Rep13<-replace(MPRAactiveDummy$Rep13,p.adjust(MPRAfrag1$Rep13_ttest_P,method="BH")<.05 & !is.na(MPRAfrag1$Rep13_ttest_P),T)
+	MPRAactiveDummy$Rep22<-replace(MPRAactiveDummy$Rep22,p.adjust(MPRAfrag1$Rep22_ttest_P,method="BH")<.05 & !is.na(MPRAfrag1$Rep22_ttest_P),T)
+	MPRAactiveDummy$Rep23<-replace(MPRAactiveDummy$Rep23,p.adjust(MPRAfrag1$Rep23_ttest_P,method="BH")<.05 & !is.na(MPRAfrag1$Rep23_ttest_P),T)
+	MPRAactive1_2<-MPRAfrag1[rowSums(MPRAactiveDummy)>1,]
 	lact<-MPRAfrag1[MPRAfrag1$Rep12_cDNAmedian > MPRAfrag1$Rep12_pDNAmedian & MPRAfrag1$Rep13_cDNAmedian > MPRAfrag1$Rep13_pDNAmedian 
 		& MPRAfrag1$Rep22_cDNAmedian > MPRAfrag1$Rep22_pDNAmedian & MPRAfrag1$Rep23_cDNAmedian > MPRAfrag1$Rep23_pDNAmedian 
-		& apply(MPRAfrag1[,20:23],1,mean) >.1 & !is.na(MPRAfrag1$Rep23_ttest_P) & MPRAfrag1$Alignment %in% MPRAactive1_1$Alignment,]
-	MPRAactive1_2<-MPRAfrag1[MPRAfrag1$Alignment %in% lact$Alignment,]
+		& !is.na(MPRAfrag1$Rep23_ttest_P) & MPRAfrag1$Alignment %in% MPRAactive1_1$Alignment,]
+	MPRAactive1_2<-MPRAactive1_2[MPRAactive1_2$Alignment %in% lact$Alignment,]
 	write.table(MPRAactive1_2,"data/MPRAactive1_2.tsv",quote=F,row.names=F,sep="\t")
-	rm(lact)
+	rm(list=c("a","lact","MPRAactiveDummy"))
 }
 
 # Differentially active fragments agree in direction and have an average log2 fold change >0.2
 if(file.exists("data/diffActive1_2.tsv")){ # If available load; else create
 	MPRAda1_2<-read.delim("data/diffActive1_2.tsv",stringsAsFactors=F)
 }else{
+	a<-nrow(MPRAfold1)
+	MPRAdaDummy<-data.frame(Rep12=double(a),Rep13=double(a),Rep22=double(a),Rep23=double(a))
+	MPRAdaDummy$Rep12<-replace(MPRAdaDummy$Rep12,p.adjust(MPRAfold1$Rep12_ttest_DA_P,method="BH")<.05 & !is.na(MPRAfold1$Rep12_ttest_DA_P),T)
+	MPRAdaDummy$Rep13<-replace(MPRAdaDummy$Rep13,p.adjust(MPRAfold1$Rep13_ttest_DA_P,method="BH")<.05 & !is.na(MPRAfold1$Rep13_ttest_DA_P),T)
+	MPRAdaDummy$Rep22<-replace(MPRAdaDummy$Rep22,p.adjust(MPRAfold1$Rep22_ttest_DA_P,method="BH")<.05 & !is.na(MPRAfold1$Rep22_ttest_DA_P),T)
+	MPRAdaDummy$Rep23<-replace(MPRAdaDummy$Rep23,p.adjust(MPRAfold1$Rep23_ttest_DA_P,method="BH")<.05 & !is.na(MPRAfold1$Rep23_ttest_DA_P),T)
+	MPRAda1_2<-MPRAfold1[rowSums(MPRAdaDummy)>1,]
+
 	MPRAbias1<-cbind(MPRAda1_1[,1:6],
 		Rep12_actDiff=MPRAda1_1$Rep12_actMedian_hs-MPRAda1_1$Rep12_actMedian_pt,Rep13_actDiff=MPRAda1_1$Rep13_actMedian_hs-MPRAda1_1$Rep13_actMedian_pt,
 		Rep22_actDiff=MPRAda1_1$Rep22_actMedian_hs-MPRAda1_1$Rep22_actMedian_pt,Rep23_actDiff=MPRAda1_1$Rep23_actMedian_hs-MPRAda1_1$Rep23_actMedian_pt,
@@ -669,12 +684,12 @@ if(file.exists("data/diffActive1_2.tsv")){ # If available load; else create
 			& apply(MPRAbias1[,7:10],1,mean) >.2]
 	lfc.lst<-c(lfc.lst,MPRAbias1$Alignment[MPRAbias1$Rep12_actDiff<0 & MPRAbias1$Rep13_actDiff<0 & MPRAbias1$Rep22_actDiff<0 & MPRAbias1$Rep23_actDiff<0 
 			& apply(MPRAbias1[,7:10],1,mean) < -.2])
-	MPRAda1_2<-MPRAfold1[MPRAfold1$Alignment %in% lfc.lst,]
+	MPRAda1_2<-MPRAda1_2[MPRAda1_2$Alignment %in% lfc.lst,]
 	write.table(MPRAda1_2,"data/diffActive1_2.tsv",quote=F,row.names=F,sep="\t")
 	bedtable<-cbind(MPRAda1_2[,c(2:6)],diff=apply(MPRAda1_2[,23:24],1,mean)-apply(MPRAda1_2[,48:49],1,mean))
 	bedtable$Start<-bedtable$Start-1
 	write.table(bedtable,"data/diffActive1_2.bed",sep="\t",quote=F,row.names=F,col.names=F)
-	rm(list=c("bedtable","lfc.lst","MPRAbias1"))
+	rm(list=c("a","bedtable","lfc.lst","MPRAbias1","MPRAdaDummy"))
 }
 
 ### FRAGMENT SUBSET BED FILES ###
