@@ -467,7 +467,6 @@ if(file.exists("data/MPRAfold1.tsv")){ # If available load; else write
 	colnames(MPRAfold1)<-sub('.x','_hs',colnames(MPRAfold1),fixed=T)
 	colnames(MPRAfold1)<-sub('.y','_pt',colnames(MPRAfold1),fixed=T)
 	
-	# Folded active fragments # (re)move?
 	MPRAfoldActive1<-MPRAfold1[MPRAfold1$Alignment %in% unique(sub('_Chimp','',MPRAactive1_1$Alignment)),]
 	MPRAfoldActive1<-cbind(MPRAfoldActive1,active_hs=double(nrow(MPRAfoldActive1)),active_pt=double(nrow(MPRAfoldActive1)))
 	for(i in 1:nrow(MPRAactive1_1)){
@@ -655,7 +654,18 @@ if(file.exists("data/MPRAactive1_2.tsv")){ # If available load; else create
 		& !is.na(MPRAfrag1$Rep23_ttest_P) & MPRAfrag1$Alignment %in% MPRAactive1_1$Alignment,]
 	MPRAactive1_2<-MPRAactive1_2[MPRAactive1_2$Alignment %in% lact$Alignment,]
 	write.table(MPRAactive1_2,"data/MPRAactive1_2.tsv",quote=F,row.names=F,sep="\t")
-	rm(list=c("a","lact","MPRAactiveDummy"))
+	MPRAdataDummy<-unique(MPRAdata1[,c(2,4:6)])
+	bedAct<-cbind(MPRAactive1_2[,c(1:4,6,7)])
+	for(i in 1:nrow(bedAct)){
+		if(grepl("Chimp",bedAct$Alignment[i])==T){
+			bedAct$Chr[i]<-MPRAdataDummy$Chr[MPRAdataDummy$Alignment==sub("_Chimp",'',bedAct$Alignment[i])]
+			bedAct$Start[i]<-MPRAdataDummy$Start[MPRAdataDummy$Alignment==sub("_Chimp",'',bedAct$Alignment[i])]
+			bedAct$Stop[i]<-MPRAdataDummy$Stop[MPRAdataDummy$Alignment==sub("_Chimp",'',bedAct$Alignment[i])]
+	}}
+	bedAct<-unique(bedAct[,-1])
+	bedAct$Start<-bedAct$Start-1
+	write.table(bedAct,"data/MPRAactive1_2.bed",row.names=F,col.names=F,quote=F,sep="\t")
+	rm(list=c("a","bedAct","lact","MPRAactiveDummy"))
 }
 
 # Differentially active fragments agree in direction and have an average log2 fold change >0.2
@@ -691,6 +701,7 @@ if(file.exists("data/diffActive1_2.tsv")){ # If available load; else create
 	write.table(bedtable,"data/diffActive1_2.bed",sep="\t",quote=F,row.names=F,col.names=F)
 	rm(list=c("a","bedtable","lfc.lst","MPRAbias1","MPRAdaDummy"))
 }
+MPRAda1_2<-cbind(MPRAda1_2,diff=apply(MPRAda1_2[,19:22],1,mean)-apply(MPRAda1_2[,44:47],1,mean))
 
 ### FRAGMENT SUBSET BED FILES ###
 MPRAdataDummy<-unique(MPRAdata1[,c(2,4:6)])
@@ -741,7 +752,7 @@ chimpMeas$Start<-chimpMeas$Start-1
 write.table(chimpMeas[,-1],"data/panTro2tohg19-measured-frags.bed",quote=F,row.names=F,col.names=F,sep="\t") # Measured chimpanzee fragments in hg19
 rm(list=c("bedAct","bedBoth","chimpBed","chimpMeas","chimpSpec","humanBed","humanMeas","humanSpec","i","MPRAdataDummy"))
 
-### OUTPUT FRAGMENT TABLES FOR MPRA ROUND 2 ###
+### OUTPUT FRAGMENT TABLES FOR THE SECOND MPRA ###
 # 2 - Differentially active fragments #
 DAdata<-MPRAfrag1[MPRAfrag1$Alignment %in% paste(MPRAda1_1$Alignment,"Chimp",sep="_") | MPRAfrag1$Alignment %in% MPRAda1_1$Alignment,1:7]
 DAdata<-cbind(DAdata,Ortholog_Seq=double(nrow(DAdata)))

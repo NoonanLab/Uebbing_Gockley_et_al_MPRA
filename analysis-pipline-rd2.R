@@ -39,8 +39,9 @@ if(file.exists("data/MPRAnorm2.tsv.gz")){ # If file available, load; else create
 	rm(list=c("i","lib.sizes","table"))
 }
 
-if(file.exists("data/MPRAfrag2.tsv")){ # If file available, load; else create
+if(file.exists("data/MPRAactive2.tsv")){ # If file available, load; else create
 	MPRAfrag2<-read.delim("data/MPRAfrag2.tsv",stringsAsFactors=F)
+	MPRAactive2<-read.delim("data/MPRAactive2.tsv",stringsAsFactors=F)
 }else{
 	Rep1_cDNAdata<-MPRAnorm2[,c(2,13)] %>% nest(-Alignment) # group by fragment name
 	lens<-double(length(Rep1_cDNAdata$data))
@@ -137,6 +138,7 @@ if(file.exists("data/MPRAfrag2.tsv")){ # If file available, load; else create
 	colnames(MPRAfrag2)[ncol(MPRAfrag2)]<-"n_tags"
 	MPRAactive2<-MPRAfrag2[p.adjust(MPRAfrag2$Rep1_ttestVneg_P,method="BH")<.05 & p.adjust(MPRAfrag2$Rep2_ttestVneg_P,method="BH")<.05,]
 	write.table(MPRAfrag2,"data/MPRAfrag2.tsv",row.names=F,sep="\t",quote=F)
+	write.table(MPRAactive2,"data/MPRAactive2.tsv",row.names=F,sep="\t",quote=F)
 	rm(list=c("i","lens","Rep1_activitySortedVals12","Rep1_activitySortedVals12sd","Rep1_actMedian12","Rep1_cDNAdata","Rep1_cDNAmedian12",
 		"Rep1_cDNAsortedVals","Rep1_cDNAsortedVals12","Rep1_NEGtcvpP","Rep1_NEGtcvpRes","Rep1_pDNAdata","Rep1_pDNAmedian12","Rep1_pDNAsortedVals",
 		"Rep1_pDNAsortedVals12","Rep1_tcvpP","Rep1_tcvpRes","Rep2_activitySortedVals12","Rep2_activitySortedVals12sd","Rep2_actMedian12",
@@ -150,18 +152,80 @@ MPRAfrag2copy<-MPRAfrag2
 MPRAfrag2copy$Alignment<-sub("_hsSUB_.*_Chimp_C+_B","_hsSUB_Chimp",MPRAfrag2copy$Alignment)
 MPRAfrag2copy$Alignment<-sub("_hsSUB_.*_Human_H+_.*","_hsSUB",MPRAfrag2copy$Alignment)
 MPRAfrag2copy$Alignment<-sub("_hsSUB_.*_Human_C+_NB","_hsSUB_Chimp",MPRAfrag2copy$Alignment)
-MPRAfrag12<-merge(MPRAfrag1[,c(1,20:23)],MPRAfrag2copy[,c(1,12,13)])
+MPRAfrag12<-merge(MPRAfrag1[,c(1,8:11,14:17,20:23)],MPRAfrag2copy[,c(1,8:13)])
+# Compare pDNA, cDNA and activity distributions #
+# MPRA 1
+p12d<-density(MPRAfrag12$Rep12_pDNAmedian)
+p13d<-density(MPRAfrag12$Rep13_pDNAmedian)
+p22d<-density(MPRAfrag12$Rep22_pDNAmedian)
+p23d<-density(MPRAfrag12$Rep23_pDNAmedian)
+c12d<-density(MPRAfrag12$Rep12_cDNAmedian)
+c13d<-density(MPRAfrag12$Rep13_cDNAmedian)
+c22d<-density(MPRAfrag12$Rep22_cDNAmedian)
+c23d<-density(MPRAfrag12$Rep23_cDNAmedian)
+a12d<-density(MPRAfrag12$Rep12_actMedian)
+a13d<-density(MPRAfrag12$Rep13_actMedian)
+a22d<-density(MPRAfrag12$Rep22_actMedian)
+a23d<-density(MPRAfrag12$Rep23_actMedian)
+par(mfrow=c(6,3),las=1)
+par(mfrow=c(4,3),las=1)
+plot(p12d,ylab="Relative amount",expression(paste(log[2]," pDNA")),main="MPRA 1 rep 12",xlim=c(-5,3))
+abline(v=p12d$x[which.max(p12d$y)],lwd=2)
+plot(c12d,ylab="Relative amount",expression(paste(log[2]," cDNA")),main="MPRA 1 rep 12",xlim=c(-5,3))
+abline(v=c12d$x[which.max(c12d$y)],lwd=2)
+plot(a12d,ylab="Relative amount",expression(paste(log[2]," activity")),main="MPRA 1 rep 12",xlim=c(-5,3))
+abline(v=a12d$x[which.max(a12d$y)],lwd=2)
+plot(p13d,ylab="Relative amount",expression(paste(log[2]," pDNA")),main="MPRA 1 rep 13",xlim=c(-5,3))
+abline(v=p13d$x[which.max(p13d$y)],lwd=2)
+plot(c13d,ylab="Relative amount",expression(paste(log[2]," cDNA")),main="MPRA 1 rep 13",xlim=c(-5,3))
+abline(v=c13d$x[which.max(c13d$y)],lwd=2)
+plot(a13d,ylab="Relative amount",expression(paste(log[2]," activity")),main="MPRA 1 rep 13",xlim=c(-5,3))
+abline(v=a13d$x[which.max(a13d$y)],lwd=2)
+plot(p22d,ylab="Relative amount",expression(paste(log[2]," pDNA")),main="MPRA 1 rep 22",xlim=c(-5,3))
+abline(v=p22d$x[which.max(p22d$y)],lwd=2)
+plot(c22d,ylab="Relative amount",expression(paste(log[2]," cDNA")),main="MPRA 1 rep 22",xlim=c(-5,3))
+abline(v=c22d$x[which.max(c22d$y)],lwd=2)
+plot(a22d,ylab="Relative amount",expression(paste(log[2]," activity")),main="MPRA 1 rep 22",xlim=c(-5,3))
+abline(v=a22d$x[which.max(a22d$y)],lwd=2)
+plot(p23d,ylab="Relative amount",expression(paste(log[2]," pDNA")),main="MPRA 1 rep 23",xlim=c(-5,3))
+abline(v=p23d$x[which.max(p23d$y)],lwd=2)
+plot(c23d,ylab="Relative amount",expression(paste(log[2]," cDNA")),main="MPRA 1 rep 23",xlim=c(-5,3))
+abline(v=c23d$x[which.max(c23d$y)],lwd=2)
+plot(a23d,ylab="Relative amount",expression(paste(log[2]," activity")),main="MPRA 1 rep 23",xlim=c(-5,3))
+abline(v=a23d$x[which.max(a23d$y)],lwd=2)
+
+# MPRA 2
+p1d<-density(MPRAfrag12$Rep1_pDNAmedian)
+p2d<-density(MPRAfrag12$Rep2_pDNAmedian)
+c1d<-density(MPRAfrag12$Rep1_cDNAmedian)
+c2d<-density(MPRAfrag12$Rep2_cDNAmedian)
+a1d<-density(MPRAfrag12$Rep1_actMedian)
+a2d<-density(MPRAfrag12$Rep2_actMedian)
+par(mfrow=c(2,4),las=1)
+plot(p1d,ylab="Relative amount",expression(paste(log[2]," pDNA")),main="MPRA 2 rep 1",xlim=c(-5,3))
+abline(v=p1d$x[which.max(p1d$y)],lwd=2)
+plot(c1d,ylab="Relative amount",expression(paste(log[2]," cDNA")),main="MPRA 2 rep 1",xlim=c(-5,3))
+abline(v=c1d$x[which.max(c1d$y)],lwd=2)
+plot(a1d,ylab="Relative amount",expression(paste(log[2]," activity")),main="MPRA 2 rep 1",xlim=c(-5,3))
+abline(v=a1d$x[which.max(a1d$y)],lwd=2)
+plot(p2d,ylab="Relative amount",expression(paste(log[2]," pDNA")),main="MPRA 2 rep 2",xlim=c(-5,3))
+abline(v=p2d$x[which.max(p2d$y)],lwd=2)
+plot(c2d,ylab="Relative amount",expression(paste(log[2]," cDNA")),main="MPRA 2 rep 2",xlim=c(-5,3))
+abline(v=c2d$x[which.max(c2d$y)],lwd=2)
+plot(a2d,ylab="Relative amount",expression(paste(log[2]," activity")),main="MPRA 2 rep 2",xlim=c(-5,3))
+abline(v=a2d$x[which.max(a2d$y)],lwd=2)
 
 # Correlations
+# MPRA rd 1 vs. 1
 cor.test(MPRAfrag12$Rep12_actMedian,MPRAfrag12$Rep13_actMedian) # p-value < 2.2e-16, r = 0.9134224
 cor.test(MPRAfrag12$Rep12_actMedian,MPRAfrag12$Rep22_actMedian) # p-value < 2.2e-16, r = 0.9051204
 cor.test(MPRAfrag12$Rep12_actMedian,MPRAfrag12$Rep23_actMedian) # p-value < 2.2e-16, r = 0.9066708
 cor.test(MPRAfrag12$Rep13_actMedian,MPRAfrag12$Rep22_actMedian) # p-value < 2.2e-16, r = 0.9056954
 cor.test(MPRAfrag12$Rep13_actMedian,MPRAfrag12$Rep23_actMedian) # p-value < 2.2e-16, r = 0.9066865
 cor.test(MPRAfrag12$Rep22_actMedian,MPRAfrag12$Rep23_actMedian) # p-value < 2.2e-16, r = 0.9117116
-
+# MPRA rd 2 vs. 2
 cor.test(MPRAfrag12$Rep1_actMedian,MPRAfrag12$Rep2_actMedian) # p-value < 2.2e-16, r = 0.9446098
-
+# MPRA rd 1 vs. 2
 cor.test(MPRAfrag12$Rep12_actMedian,MPRAfrag12$Rep1_actMedian) # p-value < 2.2e-16, r = 0.9079
 cor.test(MPRAfrag12$Rep13_actMedian,MPRAfrag12$Rep1_actMedian) # p-value < 2.2e-16, r = 0.913927
 cor.test(MPRAfrag12$Rep22_actMedian,MPRAfrag12$Rep1_actMedian) # p-value < 2.2e-16, r = 0.9189342
@@ -173,9 +237,9 @@ cor.test(MPRAfrag12$Rep23_actMedian,MPRAfrag12$Rep2_actMedian) # p-value < 2.2e-
 
 # No. of active fragments
 MPRAactive1_2<-read.delim("data/MPRAactive1_2.tsv",stringsAsFactors=F)
-nrow(MPRAfrag2copy[MPRAfrag2copy$Alignment %in% MPRAactive1_2$Alignment,]) # 3948
+nrow(MPRAfrag2copy[MPRAfrag2copy$Alignment %in% MPRAactive1_2$Alignment,]) # 3030
 nrow(MPRAfrag2copy[(p.adjust(MPRAfrag2copy$Rep1_ttestVneg_P,method="BH")<.05 & p.adjust(MPRAfrag2copy$Rep2_ttestVneg_P,method="BH")<.05) 
-		& MPRAfrag2copy$Alignment %in% MPRAactive1_2$Alignment,]) # 2481
+		& MPRAfrag2copy$Alignment %in% MPRAactive1_2$Alignment,]) # 2111
 rm(MPRAfrag2copy)
 
 ## GENERATE OBJECTS CONTAINING DIFFERENT FRAGMENT TYPES
@@ -186,7 +250,7 @@ Add_list<-Add[,c(3,6,7,15,16)] %>% nest(-Pos)
 
 # Generate folded (human vs chimpanzee allele) fragment table
 if(file.exists("data/MPRAfold2.tsv")){ # If file available, load; else create
-	MPRAfrag2<-read.delim("data/MPRAfold2.tsv",stringsAsFactors=F)
+	MPRAfold2<-read.delim("data/MPRAfold2.tsv",stringsAsFactors=F)
 }else{
 	MPRAfold2<-MPRAfrag2[grepl("_Human_H+_",MPRAfrag2$Alignment),c(2:4,12,13)]
 	colnames(MPRAfold2)[4:5]<-paste0(colnames(MPRAfold2)[4:5],"_hs")
@@ -198,7 +262,7 @@ if(file.exists("data/MPRAfold2.tsv")){ # If file available, load; else create
 
 # Test replication of differential activity using folded table
 if(file.exists("data/MPRAfoldActive2.tsv")){ # If file available, load; else create
-	MPRAfrag2<-read.delim("data/MPRAfoldActive2.tsv",stringsAsFactors=F)
+	MPRAfoldActive2<-read.delim("data/MPRAfoldActive2.tsv",stringsAsFactors=F)
 }else{
 	MPRAfoldActive2<-MPRAfold2[MPRAfold2$Pos %in% unique(MPRAactive2$Pos),]
 	## Validation differential activity test of combinatorial, validation and tile frags
@@ -247,16 +311,20 @@ if(file.exists("data/MPRAfoldActive2.tsv")){ # If file available, load; else cre
 }
 
 # Comparisons of numbers of differentially active fragments btw. MPRA rounds
-nrow(MPRAfold2[MPRAfold2$Pos %in% sub("_hsSUB.*","",MPRAactive1_2$Alignment) & MPRAfold2$Subtype=="Add",]) # 840
-MPRAfoldRep2<-MPRAfoldActive2[MPRAfoldActive2$Subtype=="Add" & MPRAfoldActive2$Pos %in% sub("_hsSUB.*","",MPRAactive1_2$Alignment),]
-nrow(MPRAfoldRep2) # 747
-nrow(MPRAfoldRep2[p.adjust(MPRAfoldRep2$Rep1_tDAActp,method="BH")<.05 & p.adjust(MPRAfoldRep2$Rep2_tDAActp,method="BH")<.05,]) # 411
+nrow(MPRAfold2[MPRAfold2$Pos %in% sub("_hsSUB.*","",MPRAactive1_2$Alignment) & MPRAfold2$Subtype=="Add",]) # 740
+MPRAda1<-read.delim("data/diffActive1_2.tsv",stringsAsFactors=F)
+nrow(MPRAfold2[MPRAfold2$Pos %in% sub("_hsSUB.*","",MPRAda1$Alignment) & MPRAfold2$Subtype=="Add",]) # 627
+MPRAfoldRep2<-MPRAfoldActive2[MPRAfoldActive2$Subtype=="Add" & MPRAfoldActive2$Pos %in% sub("_hsSUB.*","",MPRAda1$Alignment),]
+nrow(MPRAfoldRep2) # 559
+nrow(MPRAfoldRep2[p.adjust(MPRAfoldRep2$Rep1_tDAActp,method="BH")<.05 & p.adjust(MPRAfoldRep2$Rep2_tDAActp,method="BH")<.05,]) # 374
+nrow(MPRAfoldRep2[p.adjust(MPRAfoldRep2$Rep1_tDAActp,method="BH")<.05 & p.adjust(MPRAfoldRep2$Rep2_tDAActp,method="BH")<.05 & 
+		MPRAfoldRep2$Pos %in% sub("_hsSUB.*","",MPRAda1$Alignment),]) # 374
 nrow(MPRAfoldRep2[p.adjust(MPRAfoldRep2$Rep1_tDAActp,method="BH")<.05 & p.adjust(MPRAfoldRep2$Rep2_tDAActp,method="BH")<.05 & 
 	MPRAfoldRep2$Rep1_actMedian_hs>MPRAfoldRep2$Rep1_actMedian_pt & MPRAfoldRep2$Rep2_actMedian_hs>MPRAfoldRep2$Rep2_actMedian_pt & 
-	MPRAfoldRep2$Rep1_actMedian_hs-MPRAfoldRep2$Rep1_actMedian_pt+MPRAfoldRep2$Rep2_actMedian_hs-MPRAfoldRep2$Rep2_actMedian_pt >.1,]) # 215
+	MPRAfoldRep2$Rep1_actMedian_hs-MPRAfoldRep2$Rep1_actMedian_pt+MPRAfoldRep2$Rep2_actMedian_hs-MPRAfoldRep2$Rep2_actMedian_pt >.2,]) # 196
 nrow(MPRAfoldRep2[p.adjust(MPRAfoldRep2$Rep1_tDAActp,method="BH")<.05 & p.adjust(MPRAfoldRep2$Rep2_tDAActp,method="BH")<.05 & 
 	MPRAfoldRep2$Rep1_actMedian_hs<MPRAfoldRep2$Rep1_actMedian_pt & MPRAfoldRep2$Rep2_actMedian_hs<MPRAfoldRep2$Rep2_actMedian_pt & 
-	MPRAfoldRep2$Rep1_actMedian_hs-MPRAfoldRep2$Rep1_actMedian_pt+MPRAfoldRep2$Rep2_actMedian_hs-MPRAfoldRep2$Rep2_actMedian_pt < -.1,]) # 196
+	MPRAfoldRep2$Rep1_actMedian_hs-MPRAfoldRep2$Rep1_actMedian_pt+MPRAfoldRep2$Rep2_actMedian_hs-MPRAfoldRep2$Rep2_actMedian_pt < -.2,]) # 178
 
 ## ANOVA TEST OF hSUB EFFECTS
 if(file.exists("data/iEffectsizes.tsv")){ # If effect size tables available, load; else create
@@ -658,8 +726,16 @@ if(file.exists("data/hSub-summary.tsv")){ # If effect size tables available, loa
 	colnames(PsychHIC)<-c("Enhancer","hic.NPC")
 	PsychHIC<-data.frame(PsychHIC %>% group_by(Enhancer) %>% summarize(hic.NPC=paste(hic.NPC,collapse=",")))
 	sumTable<-merge(sumTable,PsychHIC,all.x=T)
+	pcHiC<-unique(read.delim("data/pcHiC-feature-intersect.tsv",stringsAsFactors=F,header=F))
+	colnames(pcHiC)<-c("Enhancer","pcHiC")
+	pcHiC<-data.frame(pcHiC %>% group_by(Enhancer) %>% summarize(pcHiC=paste(pcHiC,collapse=",")))
+	sumTable<-merge(sumTable,pcHiC,all.x=T)
+	PLACseq<-unique(read.delim("data/RG-peaks_loopedPromoters.bed",stringsAsFactors=F,header=F)[,26:27])
+	colnames(PLACseq)<-c("Enhancer","RG.PLACseq")
+	PLACseq<-data.frame(PLACseq %>% group_by(Enhancer) %>% summarize(RG.PLACseq=paste(RG.PLACseq,collapse=",")))
+	sumTable<-merge(sumTable,PLACseq,all.x=T)
 	write.table(sumTable,"data/hSub-summary.tsv",quote=F,row.names=F,sep="\t")
-	rm(list=c("amp2","amp3","ensembl","i","j","modAssign","phyP","PsychHIC","slation","tmp","tmp2","tmp3","transTab","TS3_Reilly"))
+	rm(list=c("amp2","amp3","ensembl","i","j","modAssign","pcHiC","phyP","PsychHIC","RG.PLACseq","slation","tmp","tmp2","tmp3","transTab","TS3_Reilly"))
 }
 
 q(save="no")
