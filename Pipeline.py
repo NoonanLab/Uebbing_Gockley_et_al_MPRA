@@ -1,4 +1,4 @@
-#! python
+#!/usr/bin/env python
 
 #Written by Jake Gockley and Severin Uebbing, Yale University, 2017-2019
 #Python script to run MPRA pipeline analysis on Ruddle HPC
