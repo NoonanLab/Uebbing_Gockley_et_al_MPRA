@@ -665,7 +665,7 @@ if(file.exists("data/MPRAactive1_2.tsv")){ # If available load; else create
 	bedAct<-unique(bedAct[,-1])
 	bedAct$Start<-bedAct$Start-1
 	write.table(bedAct,"data/MPRAactive1_2.bed",row.names=F,col.names=F,quote=F,sep="\t")
-	rm(list=c("a","bedAct","lact","MPRAactiveDummy"))
+	rm(list=c("a","bedAct","i","lact","MPRAactiveDummy"))
 }
 
 # Differentially active fragments agree in direction and have an average log2 fold change >0.2
@@ -702,6 +702,21 @@ if(file.exists("data/diffActive1_2.tsv")){ # If available load; else create
 	rm(list=c("a","bedtable","lfc.lst","MPRAbias1","MPRAdaDummy"))
 }
 MPRAda1_2<-cbind(MPRAda1_2,diff=apply(MPRAda1_2[,19:22],1,mean)-apply(MPRAda1_2[,44:47],1,mean))
+
+# Histograms to visualize log fold change cutoff choice
+hist(apply(MPRAfrag1[MPRAfrag1$noTags>11,20:23],1,mean),
+	breaks=seq(-.9,5.5,.05),las=1,ylab="# MPRA fragments",xlab=expression(paste(log[2]," activity")),main="")
+hist(apply(MPRAfrag1[MPRAfrag1$noTags>11 & MPRAfrag1$Alignment %in% MPRAactive1_1$Alignment,20:23],1,mean),breaks=seq(-.9,5.5,.05),add=T,col=grey(.6))
+hist(apply(MPRAfrag1[MPRAfrag1$noTags>11 & MPRAfrag1$Alignment %in% MPRAactive1_1$Alignment & MPRAfrag1$Alignment %out% MPRAactive1_2$Alignment,20:23],1,mean),
+	breaks=seq(-.9,5.5,.05),add=T,col=2)
+
+hist(abs(apply(MPRAfrag1[!is.na(MPRAfrag1$Rep23_ttest_DA_P),19:22],1,mean)-apply(MPRAfrag1[!is.na(MPRAfrag1$Rep12_ttest_DA_P),44:47],1,mean)),
+	breaks=seq(0,3.8,.05),las=1,ylab="# MPRA fragment pairs",xlab="Human - chimpanzee activity",main="")
+hist(abs(apply(MPRAfrag1[!is.na(MPRAfrag1$Rep23_ttest_DA_P) & MPRAfrag1$Alignment %in% MPRAda1_1$Alignment,19:22],1,mean)
+		-apply(MPRAfrag1[!is.na(MPRAfrag1$Rep12_ttest_DA_P) & MPRAfrag1$Alignment %in% MPRAda1_1$Alignment,44:47],1,mean)),breaks=seq(0,3.8,.05),add=T,col=grey(.6))
+hist(abs(apply(MPRAfrag1[!is.na(MPRAfrag1$Rep23_ttest_DA_P) & MPRAfrag1$Alignment %in% MPRAda1_1$Alignment & MPRAfrag1$Alignment %out% MPRAda1_2$Alignment,19:22],1,mean)
+		-apply(MPRAfrag1[!is.na(MPRAfrag1$Rep12_ttest_DA_P) & MPRAfrag1$Alignment %in% MPRAda1_1$Alignment & MPRAfrag1$Alignment %out% MPRAda1_2$Alignment,44:47],1,mean)),
+	breaks=seq(0,3.8,.05),add=T,col=2)
 
 ### FRAGMENT SUBSET BED FILES ###
 MPRAdataDummy<-unique(MPRAdata1[,c(2,4:6)])
