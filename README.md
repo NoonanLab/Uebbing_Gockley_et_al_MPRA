@@ -1,6 +1,6 @@
 # Uebbing, Gockley et al. MPRA
 
-Scripts for "Massively parallel discovery of human-specific substitutions that alter neurodevelopmental enhancer activity" by Severin Uebbing*, Jake Gockley*, Steven K. Reilly, Acadia A. Kocher, Evan Geller, Neeru Gandotra, Curt Scharfe, Justin Cotney and James P. Noonan
+Scripts for "Massively parallel discovery of human-specific substitutions that alter enhancer activity" by Severin Uebbing*, Jake Gockley*, Steven K. Reilly, Acadia A. Kocher, Evan Geller, Neeru Gandotra, Curt Scharfe, Justin Cotney and James P. Noonan (2021) [*PNAS* 118:e2007049118](https://doi.org/10.1073/pnas.2007049118).
 
 ## Pipeline.py
 Python pipeline wrapper to map and tabulate MPRA sequencing data.
