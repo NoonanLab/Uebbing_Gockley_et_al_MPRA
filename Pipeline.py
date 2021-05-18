@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #Written by Jake Gockley and Severin Uebbing, Yale University, 2017-2019
 #Python script to run MPRA pipeline analysis on Ruddle HPC
@@ -91,7 +91,6 @@ print >>PipeOUT, "Runing Mode: %s " % Mode
 
 '''Define all Python functions'''
 #INERT library-seq read strander function
-##Original script call: python ~/Scripts/Strander.py HC_RQ5138_R1.fastq HC_RQ5138_R2.fastq
 def Strander( Read1, Read2 ):
 	##Counter variable to track conversation stats:
 	AsIs = 0
@@ -127,7 +126,6 @@ def Strander( Read1, Read2 ):
 	TotCount = 0
 	LineCounter=1
 	#Loop through files simultaneously here
-	#Don't need to izip longest because mate pair files are same length
 	with open(Read1) as file1, open(Read2) as file2:
 		for line1, line2 in izip(file1, file2):  
 			line1 = line1.rstrip('\r\n')
@@ -217,7 +215,6 @@ def Strander( Read1, Read2 ):
 	print >>OUT, "Total Short Seed Inverted Orientation: %s" % ShortSeedInv
 
 # Performs a couple of quality checks on tags and their sequences
-# Originally written in perl as tag-check.pl and later translated to python by SU
 def tag_check(Tags, CREs, TagLength):
 	tag = Tags.split('.')
 	tag[-2] = tag[-2] + '_qual'
@@ -271,7 +268,6 @@ def tag_check(Tags, CREs, TagLength):
 		co.close()
 
 #Define the function that matches fragments to tags
-##Original Matcher call: python ~/Scripts/Matcher.py Cres.fastq Tags.fastq
 def Matcher(Read1, Read2):
 	##Temp line variables
 	R1_Name = ""
@@ -290,7 +286,6 @@ def Matcher(Read1, Read2):
 	Assign = {1: "R1_Name = LINE1; R2_Name = LINE2", 2: "R1_Seq = LINE1; R2_Seq = LINE2", 3: "R1_Strand = LINE1; R2_Strand = LINE2", 4: "R1_Qual = LINE1; R2_Qual = LINE2"}
 	LineCounter=1
 	#Loop through files simultaneously here
-	#Don't need to izip longest because mate pair files are same length
 	UnCut=0
 	with open(Read1) as file1, open(Read2) as file2:
 		for line1, line2 in izip(file1, file2):  
@@ -319,7 +314,6 @@ def Matcher(Read1, Read2):
 	print >>OUT, "Uncut sequences: %s" % UnCut
 
 # Pads FastQ file with adapter sequences to ensure correct mapping of similar fragments
-# Originally written in perl as pad-fastq.pl and then translated to python by SU
 def pad_fastq(infile, outfile):
 	with open(infile) as f:
 		padcnt = 1
@@ -335,14 +329,6 @@ def pad_fastq(infile, outfile):
 			print >>o, LINE
 		o.close()
 
-#Replaces Contig based alignment coordinates with MPRA fragment names
-#Specify the genomic parsing function to score the alignments
-##OG Call: python FINAL_Genomic_Parser.py <INUPUT.bam> ~/Scripts/LibTranslation.txt 
-####Changed: ~/Scripts/LibTranslation.txt to ~/Genomes/MPRA/Lib_Align_Files/Condensed_HC_Lib/Masked_LibTranslation.txt
-####Changed: print >>Parsed, name,"\t",UniqID -> print >>Parsed, name,"\t",KEY[UniqID]
-#### Skips importing genomic align MPRA translator script
-####Changed: Cigar_Tag_Anote.py rolled into this def too. Will print out tags in final file
-####Compiled_Cre_tags = Inert_Compiled_Cre_tags.txt
 def GenomicParse(bamFile, Translator, Compiled_Cre_tags, TagLength):
 	KEY = {}
 	F1= open(Translator)
@@ -434,9 +420,7 @@ def GenomicParse(bamFile, Translator, Compiled_Cre_tags, TagLength):
 				print >>Failed, name,"\t",UniqID,"\t",cigarTwo,"\t",NM,"\t",MM,"\t",Matches,"\t",Mismatches,"\t",Insertion,"\t",Deletion,"\t",Skip,"\t",SoftClip,"\t",HardClip,"\t",Padding
 
 #Filters for unique tag-Cre matches only
-##RepeatFilter.py script rolled in to print Unique and repeat tags files at once
 def MultipleTagged( File ):
-	##Original script call: python ~/Scripts/MultipleTagged.py Translated_Parsed_Cigar_withTAG_TrimedPI_gt88_temp.txt
 	F1 = open(File)
 	TotalFile = open("Inert_RepeatedTags.txt", "w")
 	Tags = {}
@@ -498,7 +482,6 @@ def Tabulator( File1 ):
 		print >>LibFile, Entry
 
 def ProcessR_sorted(infile):
-	##Original script call: python ~/Scripts/ProcessR_sorted.py CigarParsedMatched_sort.txt
 	tag = ''
 	cre = ''
 	ccount = int(0)
@@ -514,26 +497,27 @@ def ProcessR_sorted(infile):
 	                else:
 	                        if T[1] == tag and T[2] == cre:
 	                                ccount +=1
-	                                T[5:13] = map(int,T[5:13])
+	                                T[5:13] = map(float,T[5:13])
 	                                ID = (T[5]-sum(T[7:13]))/T[5]
 	                                if maxID < ID:
 	                                        maxID = ID
 	                        else:
 	                                if ccount >0:
+	                                        maxID_str = "%.2f" % maxID
 	                                        entry = [tag, cre, str(maxID), str(ccount)]
 	                                        print >>o, '\t'.join(entry)
 	                                tag = T[1]
 	                                cre = T[2]
 	                                ccount = 1
-	                                T[5:13] = map(int,T[5:13])
+	                                T[5:13] = map(float,T[5:13])
 	                                ID = (T[5]-sum(T[7:13]))/T[5]
 	                                maxID = ID
-	entry = [tag, cre, str(maxID), str(ccount)]
+	maxID_str = "%.2f" % maxID
+	entry = [tag, cre, maxID_str, str(ccount)]
 	print >>o, '\t'.join(entry)
 	o.close()
 
 def ProcessR_sorted_v2(infile, usefile, garbagefile):
-	##Original script call: python ~/Scripts/ProcessR_sorted_v2.py R_Processed.tsv R_Processed_use.tsv R_Processed_trash.tsv
 	tag = ''
 	cre = ''
 	garbage = []
@@ -568,7 +552,6 @@ def ProcessR_sorted_v2(infile, usefile, garbagefile):
 	wo.close()
 
 #Competent Library-seq read strander function
-##Original script call: python ~/Scripts/TAG_Strander_V2016_10_31.py R1_Trimmed.fastq R2_Trimmed.fastq
 def Comp_TAG_Strander( Read1, Read2 ):
 	##Counter variable to track conversation stats:
 	AsIs = 0
@@ -604,7 +587,6 @@ def Comp_TAG_Strander( Read1, Read2 ):
 	TotCount = 0
 	LineCounter=1
 	#Loop through files simultaneously here
-	#Don't need to izip longest because mate pair files are same length
 	with open(Read1) as file1, open(Read2) as file2:
 		for line1, line2 in izip(file1, file2):  
 			line1 = line1.rstrip('\r\n')
@@ -767,7 +749,6 @@ def Exp_TAG_Strander( Read1, Read2, Sample ):
 	TotCount = 0
 	LineCounter=1
 	#Loop through files simultaneously here
-	#Don't need to izip longest because mate pair files are same length
 	with open(Read1) as file1, open(Read2) as file2:
 		for line1, line2 in izip(file1, file2):
 			line1 = line1.rstrip('\r\n')
@@ -913,7 +894,6 @@ def Exp_TAG_Strander( Read1, Read2, Sample ):
 	print >>OUT, "Total R1 Align 5' SfiI (Correct): %s" % LotsMuts
 
 #Compile Count files
-#OG Call: #python BasicMerge.py pDNA_Filtered_Rep_1_2_Tags.txt pDNA_Filtered_Rep_2_2_Tags.txt cDNA_Filtered_Rep_1_2_Tags.txt cDNA_Filtered_Rep_2_2_Tags.txt Merged_CountsForR.txt
 def Compiler( Inert, Comp, pDNA, cDNA ):
 	#Load Inert Counts
 	Inertcnts = {}
@@ -1014,7 +994,6 @@ def Compiler( Inert, Comp, pDNA, cDNA ):
 
 #Annotation Sub Routines
 #Anotion Subroutine A
-##python AnnoterA.py 		
 ## Files needed CHIMP_LIB_intial_File Merged_CountsForR.txt
 def AnnoterA( resourceDir ):
 	#Translates Between Ortholog names
@@ -1136,7 +1115,6 @@ def AnnoterB( resouceDir ):
 
 #Anntotion Sub-Routine C
 ##This Subroutine takes The master Allele file and annotates the intersected human and chimp fragment fiels with position and allele info
-#Original Script Call: python AnnoteC.py 
 def AnnoterC( resouceDir ):
 	HumanPos = {}
 	HumanAllele = {}
@@ -1203,7 +1181,6 @@ def AnnoterC( resouceDir ):
 
 #Anntotion Sub-Routine D
 ###This SubRoutine annotates the master counts file with the allele changes and fragment positions of those changes
-#Original Script Call: python AnnoterD.py 
 def AnnoterD( resouceDir ):
 	MasterPos = {}
 	MasterAllele = {}
@@ -1438,7 +1415,6 @@ elif (Mode == "INERT-HIQ"):
 			print >>PipeOUT, cmd
 			subprocess.Popen(cmd, shell=True).wait()
 			#Annotate each alignment with alignment deatail, Tags, and translate alignments to CREs
-			## Resource file path integrate here!!
 			TransName = ''.join([resource,"Masked_LibTranslation.txt"])
 			GenomicParse("Inert.bam", TransName, "Inert_Compiled_Cre_tags.txt", TagLength)
 			cmd = "sort -k2,2 -k3,3 CigarParsedMatched.txt >CigarParsedMatched_sort.txt"
@@ -1446,23 +1422,7 @@ elif (Mode == "INERT-HIQ"):
 			subprocess.Popen(cmd, shell=True).wait()
 			ProcessR_sorted("CigarParsedMatched_sort.txt")
 			ProcessR_sorted_v2("R_Processed.tsv","R_Processed_use.tsv","R_Processed_trash.tsv")
-			#Cleanup files 
-			# cmd = "sed 's/ //g' Parsed_Cigar_withTAG_TrimedPI_gt88_temp.txt > temp"
-			# print >>PipeOUT, cmd
-			# subprocess.Popen(cmd, shell=True).wait()
-			# cmd = 'sed \'s/"//g\' temp > temp2'
-			# print >>PipeOUT, cmd
-			# subprocess.Popen(cmd, shell=True).wait()
-			# cmd = "mv temp2 Parsed_Cigar_withTAG_TrimedPI_gt88_temp.txt"
-			# print >>PipeOUT, cmd
-			# subprocess.Popen(cmd, shell=True).wait()
-			# cmd = "rm temp"
-			# print >>PipeOUT, cmd
-			# subprocess.Popen(cmd, shell=True).wait()
-			# #Filter out CREs with tags that represent multiple CREs
-			# ##LOOK FOR DIFFS HERRE TOO
-			# MultipleTagged("Parsed_Cigar_withTAG_TrimedPI_gt88_temp.txt")
-			# Tabulator("UniqTags_Translated_Parsed_Cigar_withTAG_TrimedPI_gt88.txt")
+
 ####Competent Library Processing pipeline
 elif (Mode == "COMP"):
 	##Example Call:
