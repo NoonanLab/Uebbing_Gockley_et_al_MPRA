@@ -152,7 +152,7 @@ MPRAfrag2copy<-MPRAfrag2
 MPRAfrag2copy$Alignment<-sub("_hsSUB_.*_Chimp_C+_B","_hsSUB_Chimp",MPRAfrag2copy$Alignment)
 MPRAfrag2copy$Alignment<-sub("_hsSUB_.*_Human_H+_.*","_hsSUB",MPRAfrag2copy$Alignment)
 MPRAfrag2copy$Alignment<-sub("_hsSUB_.*_Human_C+_NB","_hsSUB_Chimp",MPRAfrag2copy$Alignment)
-MPRAfrag12<-merge(MPRAfrag1[,c(1,8:11,14:17,20:23)],MPRAfrag2copy[,c(1,8:13)])
+MPRAfrag12<-merge(MPRAfrag1[,c(1,8:11,14:17,20:23,26:29)],MPRAfrag2copy[,c(1,8:13,16,17)])
 # Compare pDNA, cDNA and activity distributions #
 # MPRA 1
 p12d<-density(MPRAfrag12$Rep12_pDNAmedian)
@@ -241,6 +241,25 @@ nrow(MPRAfrag2copy[MPRAfrag2copy$Alignment %in% MPRAactive1_2$Alignment,]) # 303
 nrow(MPRAfrag2copy[(p.adjust(MPRAfrag2copy$Rep1_ttestVneg_P,method="BH")<.05 & p.adjust(MPRAfrag2copy$Rep2_ttestVneg_P,method="BH")<.05) 
 		& MPRAfrag2copy$Alignment %in% MPRAactive1_2$Alignment,]) # 2111
 rm(MPRAfrag2copy)
+
+# P value correlations
+cor.test(MPRAfrag12$Rep12_ttest_P,MPRAfrag12$Rep13_ttest_P,method="spearman") # p-value < 2.2e-16, rho = 0.7576574
+cor.test(MPRAfrag12$Rep12_ttest_P,MPRAfrag12$Rep22_ttest_P,method="spearman") # p-value < 2.2e-16, rho = 0.7829188
+cor.test(MPRAfrag12$Rep12_ttest_P,MPRAfrag12$Rep23_ttest_P,method="spearman") # p-value < 2.2e-16, rho = 0.7742304
+cor.test(MPRAfrag12$Rep13_ttest_P,MPRAfrag12$Rep22_ttest_P,method="spearman") # p-value < 2.2e-16, rho = 0.7724547
+cor.test(MPRAfrag12$Rep13_ttest_P,MPRAfrag12$Rep23_ttest_P,method="spearman") # p-value < 2.2e-16, rho = 0.6962185
+cor.test(MPRAfrag12$Rep22_ttest_P,MPRAfrag12$Rep23_ttest_P,method="spearman") # p-value < 2.2e-16, rho = 0.7573846
+# MPRA rd 2 vs. 2
+cor.test(MPRAfrag12$Rep1_ttestVneg_P,MPRAfrag12$Rep2_ttestVneg_P,method="spearman") # p-value < 2.2e-16, rho = 0.8271783
+# MPRA rd 1 vs. 2
+cor.test(MPRAfrag12$Rep12_ttest_P,MPRAfrag12$Rep1_ttestVneg_P,method="spearman") # p-value < 2.2e-16, rho = 0.5884334
+cor.test(MPRAfrag12$Rep13_ttest_P,MPRAfrag12$Rep1_ttestVneg_P,method="spearman") # p-value < 2.2e-16, rho = 0.663527
+cor.test(MPRAfrag12$Rep22_ttest_P,MPRAfrag12$Rep1_ttestVneg_P,method="spearman") # p-value < 2.2e-16, rho = 0.6472225
+cor.test(MPRAfrag12$Rep23_ttest_P,MPRAfrag12$Rep1_ttestVneg_P,method="spearman") # p-value < 2.2e-16, rho = 0.5634411
+cor.test(MPRAfrag12$Rep12_ttest_P,MPRAfrag12$Rep2_ttestVneg_P,method="spearman") # p-value < 2.2e-16, rho = 0.5652825
+cor.test(MPRAfrag12$Rep13_ttest_P,MPRAfrag12$Rep2_ttestVneg_P,method="spearman") # p-value < 2.2e-16, rho = 0.6482148
+cor.test(MPRAfrag12$Rep22_ttest_P,MPRAfrag12$Rep2_ttestVneg_P,method="spearman") # p-value < 2.2e-16, rho = 0.6386939
+cor.test(MPRAfrag12$Rep23_ttest_P,MPRAfrag12$Rep2_ttestVneg_P,method="spearman") # p-value < 2.2e-16, rho = 0.5601166
 
 ## GENERATE OBJECTS CONTAINING DIFFERENT FRAGMENT TYPES
 dTable2<-cbind(MPRAnorm2,act1=MPRAnorm2$cDNA1-MPRAnorm2$pDNA1,act2=MPRAnorm2$cDNA2-MPRAnorm2$pDNA2)
