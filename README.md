@@ -11,5 +11,8 @@ R scripts to analyze our first round of MPRA.
 ## analysis-pipeline-rd2.R
 R scripts to analyze our second round of MPRA.
 
+## comparison-other-methods.R
+R code used to compare different methods of activity and differetnial activity testing.
+
 ***
 With questions and comments contact severin.uebbing-&auml;t-yale.edu or james.noonan-&auml;t-yale.edu.
