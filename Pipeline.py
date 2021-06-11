@@ -724,10 +724,10 @@ def Exp_TAG_Strander( Read1, Read2, Sample ):
 	R2_Strand = ""
 	R2_Qual = ""
 	#Open output files
-	FivePrime = open("_".join([Sample,"_ReadOne.fastq"]), "w")
-	ThreePrime = open("_".join([Sample,"_ReadTwo.fastq"]), "w")
-	Garbage = open("_".join([Sample,"_Garbage_IDs.txt"]), "w")
-	OUT = open("_".join([Sample,"_StranderOutput.txt"]), "w")
+	FivePrime = open("_".join([Sample,"ReadOne.fastq"]), "w")
+	ThreePrime = open("_".join([Sample,"ReadTwo.fastq"]), "w")
+	Garbage = open("_".join([Sample,"Garbage_IDs.txt"]), "w")
+	OUT = open("_".join([Sample,"StranderOutput.txt"]), "w")
 	#Complement dictionary
 	Trans = {'A': 'T', 'T': 'A', 'C': 'G', 'G' : 'C', 'N' : 'N'}
 	Assign = {1: "R1_Name = LINE1; R2_Name = LINE2", 2: "R1_Seq = LINE1; R2_Seq = LINE2", 3: "R1_Strand = LINE1; R2_Strand = LINE2", 4: "R1_Qual = LINE1; R2_Qual = LINE2"}
