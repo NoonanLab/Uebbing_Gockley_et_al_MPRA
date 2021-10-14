@@ -1314,31 +1314,12 @@ if (Mode == "INERT"):
 			## Resource file path integrate here!!
 			TransName = ''.join([resource,"Masked_LibTranslation.txt"])
 			GenomicParse("Inert.bam", TransName, "Inert_Compiled_Cre_tags.txt", TagLength)
-			#Score Alingments with Percent Identity
-			###LOOK AT R SCRIPT DIFFS
-			cmd = "cp "+resource+"ProcessR_Pipeline.R ."
+			cmd = "sort -k2,2 -k3,3 CigarParsedMatched.txt >CigarParsedMatched_sort.txt"
 			print >>PipeOUT, cmd
 			subprocess.Popen(cmd, shell=True).wait()
-			cmd = ''.join(["R CMD BATCH \'--args ",str(ID),"\' ProcessR_Pipeline.R"])
-			print >>PipeOUT, cmd
-			subprocess.Popen(cmd, shell=True).wait()
-			#Cleanup files 
-			cmd = "sed 's/ //g' Parsed_Cigar_withTAG_TrimedPI_gt88_temp.txt > temp"
-			print >>PipeOUT, cmd
-			subprocess.Popen(cmd, shell=True).wait()
-			cmd = 'sed \'s/"//g\' temp > temp2'
-			print >>PipeOUT, cmd
-			subprocess.Popen(cmd, shell=True).wait()
-			cmd = "mv temp2 Parsed_Cigar_withTAG_TrimedPI_gt88_temp.txt"
-			print >>PipeOUT, cmd
-			subprocess.Popen(cmd, shell=True).wait()
-			cmd = "rm temp"
-			print >>PipeOUT, cmd
-			subprocess.Popen(cmd, shell=True).wait()
-			#Filter out CREs with tags that represent multiple CREs
-			##LOOK FOR DIFFS HERRE TOO
-			MultipleTagged( "Parsed_Cigar_withTAG_TrimedPI_gt88_temp.txt" )
-			Tabulator( "UniqTags_Translated_Parsed_Cigar_withTAG_TrimedPI_gt88.txt" )
+			ProcessR_sorted("CigarParsedMatched_sort.txt")
+			ProcessR_sorted_v2("R_Processed.tsv","R_Processed_use.tsv","R_Processed_trash.tsv")
+
 ####Inert Library Processing pipeline
 elif (Mode == "INERT-HIQ"):
 	##Example Call:
