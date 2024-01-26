@@ -15,4 +15,4 @@ R scripts to analyze our second round of MPRA.
 R code used to compare different methods of activity and differetnial activity testing.
 
 ***
-With questions and comments contact severin.uebbing-&auml;t-yale.edu or james.noonan-&auml;t-yale.edu.
+With questions and comments contact s.uebbing-&auml;t-uu.nl or james.noonan-&auml;t-yale.edu.
